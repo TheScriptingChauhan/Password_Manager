@@ -22,10 +22,8 @@ def login():
         if username == user and password == pas:
             print("Login Successful !!!\n")
 
-            print("Redirecting to homepage in (3)"),time.sleep(1)
-            print("Redirecting to homepage in (2)"),time.sleep(1)
-            print("Redirecting to homepage in (1)\n"),time.sleep(1)
-            display_all()
+            time.sleep(0.5)
+            del_specific()
             break
 
         else:
@@ -89,7 +87,7 @@ def display_all():
     print("+"+("-"*(max_web+1)),end='')
     print("+"+("-"*(max_user+1)),end='')
     print("+"+("-"*(max_pass))+"-+")
-
+    return 
 
     for value in values:
         
@@ -105,5 +103,28 @@ def display_all():
     print("+"+("-"*(max_web+1)),end='')
     print("+"+("-"*(max_user+1)),end='')
     print("+"+("-"*(max_pass))+"-+")
+def del_specific():
+
+    global mycursor
+
+    try:
+        web = input("Enter Website Name >>> ")
+        user = input("Enter The Website Username / Email >>> ")
+
+        if not web or not user:
+            print("Website and Username/Email cannot be empty.")
+            return
+        
+        mycursor.execute("SELECT * FROM manager")
+        rec = mycursor.fetchall()
+
+        print(rec)
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+
+
 
 login()
