@@ -99,7 +99,7 @@ def display_all():
 
     time.sleep(2)
 
-def specific(web = False,user = False):  # To delete / display a specific record 
+def specific(web=False, user=False):  # To delete / display a specific record 
 
     while True:
         if not web or not user:
@@ -119,52 +119,60 @@ def specific(web = False,user = False):  # To delete / display a specific record
         rec = mycursor.fetchone()  
 
         if rec:
-           print("Rec Found !!\n ")
-           return rec,val
+            print("Record Found!!\n")
+            return rec, val
         
         else:
-            print("No matching record found for the provided Website and Username/Email. \n")
-            web,user = False,False
-
+            if not user:
+                # Avoid showing the "No matching record found" message when adding a new password
+                print("No matching record found for the provided Website and Username/Email.\n")
+                web, user = False, False
+            else:
+                return rec  # Return None if no record is found
 
 def delete():
-    
-            rec,val = specific()
+    while True:
+        result = specific()  # Call specific to find if record exists
 
-            web ,user = val[0],val[1]
-     
+        if result:
+            rec,val = result #unpack if result exisits so it wont return cannot unpack none type
+            web, user = val[0], val[1]
+
             delete_query = "DELETE FROM manager WHERE Website = %s AND Username = %s"
- 
             mycursor.execute(delete_query, val)
-            mydb.commit()  
- 
+            mydb.commit()
+
             print(f"Deleted record for Website: {web} and Username/Email: {user}\n")
+        else:
+            print("No matching record found to delete.")
+            return  # Exit the function if no record is found
 
-            while True:
-                
-                ch = input("Do you want to delete another record? (y/n): ").lower()
-                
-                if ch == "y":
-                    time.sleep(2)
-                    break  # Break the inner loop to continue deleting more records
-                
-                elif ch == "n":
-                    time.sleep(2)
-                    return  # Exit the function
-                
-                else:
-                    print("Invalid input, please enter Y or N.")
+        while True:
+            ch = input("Do you want to delete another record? (y/n): ").lower()
 
+            if ch == "y":
+                time.sleep(2)
+                break  # Break the inner loop to continue deleting more records
+
+            elif ch == "n":
+                time.sleep(2)
+                return  # Exit the function
+
+            else:
+                print("Invalid input, please enter Y or N.")
 
 def display_specific():
 
     while True:
-        rec,val = specific()
-
-        print("\nRecord Found : \n")
-        print(f"Website : {rec[0]}")
-        print(f"Username : {rec[1]}")
-        print(f"Password : {rec[2]}\n")
+        result = specific()
+        if result:
+            rec,val = result
+            print("\nRecord Found : \n")
+            print(f"Website : {rec[0]}")
+            print(f"Username : {rec[1]}")
+            print(f"Password : {rec[2]}\n")
+        else:
+            print("No Such Record Found")
 
         while True:
             ch = input("Do you want to search more records? (y/n)").lower()
@@ -218,21 +226,70 @@ def display():
     time.sleep(1)
     return
 
+def update_pass():
+
+    while True:
+        web = input("Enter Website name : ")
+        
+        query = ("SELECT * FROM manager WHERE Website = %s")
+        
+        mycursor.execute(query,(web,))
+
+        rec = mycursor.fetchall()
+
+        if rec:
+            for i in rec:
+                print(f"\nWebsite: {i[0]} \nUsername/Email: {i[1]} \nPassword: {i[2]}")
+        else:
+            print("No records found.")
+            continue # Restart While loop 
+        
+        while True: # if wrong username can start again from username and not from website 
+            user = input("Enter Username : ")
+
+            found = False
+
+            for i in rec:
+                print(rec)
+                if rec[0][1] == user:
+                    found = True                    
+            
+            if found:
+                passw = input("Enter new password : ")
+                query = "UPDATE manager SET Password = %s WHERE Website = %s and Username = %s"
+                mycursor.execute(query,(passw,web,user))
+
+                print(mycursor.rowcount,"Record(s) inserted !!! ")
+                break # Exit from 2nd While loop 
+
+            else:
+                print("Record Not Found !! ") 
+                continue # Restart While loop 
+        
+        query = "SELECT * FROM manager WHERE Website = %s and  Username = %s"
+
+        mycursor.execute(query,(web,user))
+
+        for i in rec:
+            print(f"\nWebsite: {i[0]} \nUsername/Email: {i[1]} \nPassword: {i[2]}")
+        break
+
 
 def add_pass():
 
     while True:
         web = input("Enter Website Name :").strip()
         user = input("Enter Username / Email : ").strip()
-        password = input("Enter Password : ")
 
-        rec,val = specific(web,user)
+        rec = specific(web,user)
 
-        if web == rec[0] and user == rec[1]:
-            print("\n An Entry Already exists for the same website and username !! ")
-            time.sleep(1)
+        if rec: #In case non empty record returns
+            if web == rec[0] and user == rec[1]:
+                print("\n An Entry Already exists for the same website and username !! ")
+                time.sleep(1)
 
         else:
+            password = input("Enter Password : ")
             query = "INSERT INTO manager VALUES (%s,%s,%s)"
             val = (web,user,password)
 
@@ -249,7 +306,7 @@ def main():
         print("Choose What you want to do :  ")
         print("1. Add a new pass \n2. Delete a pass")
         print("3. Display a Specific Record \n4. Display Specific Records with same website or password")
-        print("5. Display all Records \n0. Exit")
+        print("5. Display all Records \n6. Update Password \n0. Exit")
         
         ch = int(input("Enter Your Choice : "))
 
@@ -267,6 +324,9 @@ def main():
 
         elif ch == 5:
             display_all()
+
+        elif ch == 6:
+            update_pass()
         
         elif ch == 0:
             return
