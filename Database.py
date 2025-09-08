@@ -3,7 +3,7 @@ import mysql.connector
 mydb = mysql.connector.connect(host='localhost', user='root', password='Apc@2007#CS')
 
 if mydb.is_connected():
-    print("Connection established")
+    print("Connection established !!! ")
 else:
     print("Connection Failed")
 
