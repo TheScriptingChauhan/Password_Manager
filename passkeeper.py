@@ -4,7 +4,7 @@ import mysql.connector,time
 
 global mycursor, mydb
 
-mydb = mysql.connector.connect(host = 'localhost',user='root',password="Apc@2007#CS", database = 'password_manager2')
+mydb = mysql.connector.connect(host = 'localhost',user='root',password="baba", database = 'password_manager2')
 
  
 mycursor = mydb.cursor()

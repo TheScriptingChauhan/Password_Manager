@@ -1,6 +1,6 @@
 import mysql.connector
 
-mydb = mysql.connector.connect(host='localhost', user='root', password='Apc@2007#CS')
+mydb = mysql.connector.connect(host='localhost', user='root', password='baba')
 
 if mydb.is_connected():
     print("Connection established !!! ")
@@ -9,12 +9,13 @@ else:
 
 mycursor = mydb.cursor()
 
-# mycursor.execute("CREATE DATABASE password_manager2")
+#mycursor.execute("CREATE DATABASE password_manager")
 
-mycursor.execute("USE password_manager2")
-mycursor.execute("CREATE TABLE IF NOT EXISTS manager(Website VARCHAR(50), Username VARCHAR(50), Password VARCHAR(50))")
+mycursor.execute("USE password_manager")
+mycursor.execute("CREATE TABLE manager(Website VARCHAR(50), Username VARCHAR(50), Password VARCHAR(50))")
 
-mycursor.execute("""INSERT INTO manager (Website, Username, Password) VALUES 
+mycursor.execute("""INSERT INTO manager (Website, Username, Password) VALUES
+                 ('Website', 'Username', 'Password')
                  ('Amazon', 'Prime', 'IamPrimeUser'),
                  ('Forest', 'Prime', 'Green@Cover_'),
                  ('River', 'Prime', 'LargeForest'),

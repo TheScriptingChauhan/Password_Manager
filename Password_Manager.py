@@ -4,14 +4,22 @@ import customtkinter as ctk
 import CTkMessagebox,CTkTable
 import tkinter as tk
 import mysql.connector
+import crypto_utils
 
-mydb = mysql.connector.connect(host = 'localhost',user='root',password="Apc@2007#CS")
+mydb = mysql.connector.connect(host = 'localhost',user='root',password="baba")
 mycursor = mydb.cursor()
 mycursor.execute("USE password_manager")
 
 #TABLE CONTENTS
 mycursor.execute("Select * from manager")
-value = list(mycursor.fetchall())
+value = [list(r) for r in mycursor.fetchall()]
+
+# Decrypt passwords if they are encrypted; leave plain text as-is
+for row in value:
+    try:
+        row[2] = crypto_utils.decrypt(row[2])
+    except Exception:
+        pass
 
 root = ctk.CTk()
 root._set_appearance_mode("dark")
@@ -166,11 +174,14 @@ def append_pass():
     #SQL PART
 
     mycursor.execute("USE password_manager")
+    # encrypt password before storing
+    enc_pswd = crypto_utils.encrypt(pswd)
     sql = "INSERT INTO manager (Website, Username, Password) VALUES (%s,%s,%s)"
-    val = (web,User,pswd)
-    mycursor.execute(sql,val)
+    val = (web,User,enc_pswd)
+    mycursor.execute(sql, val)
     mydb.commit()
 
+    # append plain password for UI display
     value.append([web,User,pswd])
     tk.messagebox.showinfo("Password Manager", "Password sucessfully added")
 
